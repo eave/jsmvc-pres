@@ -80,13 +80,27 @@ app.components = app.components || {};
   });
 
   var NewTodo = app.components.NewTodo = React.createClass({
+    // when you're modifying state, you can use built in react mixins that link state to a form or input
+    // so we have code on line 98 for the 'New Todo' input that automatically adjusts the value of the 'newValue' in state depending on the value in the input field
+    mixins: [React.addons.LinkedStateMixin],
+    getInitialState: function() {
+      return {
+        newValue: ''
+      };
+    },
+
+    handleNewTodo: function(event) {
+      this.props.createNewTodo(this.state.newValue);
+      this.setState({newValue: ''});
+    },
+
     render: function() {
       return (
         <div className="add-todo-group input-group input-group-lg">
           <span className="input-group-addon">
             <i className="glyphicon glyphicon-list-alt"></i>
           </span>
-          <input placeholder="New Todo" className="form-control" type="text" />
+          <input valueLink={this.linkState('newValue')} placeholder="New Todo" className="form-control" type="text" />
           <span className="input-group-btn">
             <button className="btn btn-success" type="button" onClick={this.handleNewTodo}>
               <i className="glyphicon glyphicon-plus"></i>
