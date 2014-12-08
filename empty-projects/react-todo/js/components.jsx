@@ -16,6 +16,15 @@ app.components = app.components || {};
       };
     },
 
+    // react works by listening for events in the app, and then rerendering everything
+    // if the underlying data from the parent doesn't change though, it just rerenders with the same data, and you don't see updates
+    // this function addresses that
+    updateVal: function(val, index) {
+      var state = this.state;
+      state.todos[index].val = val;
+      this.setState(state);
+    },
+
     // this is a native react function that is called and executes before the component mounts and goes out onto the page
     componentWillMount: function() {
 
@@ -38,6 +47,7 @@ app.components = app.components || {};
           <NewTodo />
           <TodoList
             todos = {this.state.todos}
+            updateVal = {this.updateVal}
           />
           <ClearCompleted />
         </div>
@@ -58,6 +68,7 @@ app.components = app.components || {};
       // the code with .map below is the equivalent of ng-repeat for react
       // in react, it's actually just vanilla javascript
       // here is where we're receiving the todo props that we passed down to 'TodoList' from 'TodoApp'
+      var context = this;
       return (
         <div className="todos">
           {this.props.todos.map(function(el, index) {
@@ -66,15 +77,21 @@ app.components = app.components || {};
               <TodoItem
                 todo={el}
                 index={index}
+                updateVal={context.props.updateVal}
               />
             )
-          })}
+          }.bind(this))}
         </div>
       );
     }
   });
 
   var TodoItem = app.components.TodoItem = React.createClass({
+    handleVal: function(event) {
+      // when we call updateVal, we're calling the same function defined on line 22, and passed down through TodoList and TodoItem
+      this.props.updateVal(event.target.value, this.props.index);
+    },
+
     render: function() {
       var inputClassName = "form-control";
       if (this.props.todo.completed) {
@@ -86,7 +103,7 @@ app.components = app.components || {};
           <span className="input-group-addon">
             <input checked={this.props.todo.completed} type="checkbox" />
           </span>
-          <input type="text" value={this.props.todo.val} className={inputClassName} />
+          <input onChange={this.handleVal} type="text" value={this.props.todo.val} className={inputClassName} />
           <span className="input-group-btn">
             <button className="btn btn-danger" type="button">
               <i className="glyphicon glyphicon-remove"></i>
