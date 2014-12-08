@@ -18,5 +18,12 @@ var app = app || {};
     );
   };
 
+  // for a more complex app, you could put this ajax request in a store
+  app.retrieveData = function() {
+    // this is returning the dummy data that we're storing in fixtures.js
+    // in a real app, you'd get actual data from an ajax request here
+    return app.FIXTURES;
+  };
+
   app.init();
 })();
