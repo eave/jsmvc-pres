@@ -16,15 +16,6 @@ app.components = app.components || {};
       };
     },
 
-    // react works by listening for events in the app, and then rerendering everything
-    // if the underlying data from the parent doesn't change though, it just rerenders with the same data, and you don't see updates
-    // this function addresses that
-    updateVal: function(val, index) {
-      var state = this.state;
-      state.todos[index].val = val;
-      this.setState(state);
-    },
-
     // this is a native react function that is called and executes before the component mounts and goes out onto the page
     componentWillMount: function() {
 
@@ -38,6 +29,27 @@ app.components = app.components || {};
       console.log(this.state);
     },
 
+    // react works by listening for events in the app, and then rerendering everything
+    // if the underlying data from the parent doesn't change though, it just rerenders with the same data, and you don't see updates
+    // this function addresses that
+    updateVal: function(val, index) {
+      var state = this.state;
+      state.todos[index].val = val;
+      this.setState(state);
+    },
+
+    toggleCompleted: function(index) {
+      var state = this.state;
+      state.todos[index].completed = !state.todos[index].completed;
+      this.setState(state);
+    },
+
+    deleteTodo: function(index) {
+      var state = this.state;
+      state.todos.splice(index, 1);
+      this.setState(state);
+    },
+
     render: function() {
       // jsx can only have one root element
       // in the todos = {this.state.todos} line below, we are passing the todos 'state' down from the parent component 'TodoApp', which we're inside of, down to the child component 'TodoList' in the form of props
@@ -48,6 +60,8 @@ app.components = app.components || {};
           <TodoList
             todos = {this.state.todos}
             updateVal = {this.updateVal}
+            toggleCompleted = {this.toggleCompleted}
+            deleteTodo = {this.deleteTodo}
           />
           <ClearCompleted />
         </div>
@@ -78,9 +92,11 @@ app.components = app.components || {};
                 todo={el}
                 index={index}
                 updateVal={context.props.updateVal}
+                toggleCompleted = {context.props.toggleCompleted}
+                deleteTodo = {context.props.deleteTodo}
               />
             )
-          }.bind(this))}
+          })}
         </div>
       );
     }
@@ -92,6 +108,14 @@ app.components = app.components || {};
       this.props.updateVal(event.target.value, this.props.index);
     },
 
+    handleToggle: function(event) {
+      this.props.toggleCompleted(this.props.index);
+    },
+
+    handleDelete: function(event) {
+      this.props.deleteTodo(this.props.index);
+    },
+
     render: function() {
       var inputClassName = "form-control";
       if (this.props.todo.completed) {
@@ -101,11 +125,11 @@ app.components = app.components || {};
       return (
         <div className="input-group input-group-lg">
           <span className="input-group-addon">
-            <input checked={this.props.todo.completed} type="checkbox" />
+            <input onChange={this.handleToggle} checked={this.props.todo.completed} type="checkbox" />
           </span>
           <input onChange={this.handleVal} type="text" value={this.props.todo.val} className={inputClassName} />
           <span className="input-group-btn">
-            <button className="btn btn-danger" type="button">
+            <button onClick={this.handleDelete} className="btn btn-danger" type="button">
               <i className="glyphicon glyphicon-remove"></i>
             </button>
           </span>
