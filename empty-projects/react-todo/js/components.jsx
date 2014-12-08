@@ -29,6 +29,14 @@ app.components = app.components || {};
       console.log(this.state);
     },
 
+    createNewTodo: function(newValue) {
+      var state = this.state;
+      // this is just creating a new todo object and adding it to the array
+      // unshift works like push, but adds it to the front of the array
+      state.todos.unshift({val:newValue, completed:false });
+      this.setState(state);
+    },
+
     // react works by listening for events in the app, and then rerendering everything
     // if the underlying data from the parent doesn't change though, it just rerenders with the same data, and you don't see updates
     // this function addresses that
@@ -56,7 +64,9 @@ app.components = app.components || {};
       // this.state.todos refers to the todos array specified on line fifteen
       return (
         <div className="outer-container">
-          <NewTodo />
+          <NewTodo 
+            createNewTodo={this.createNewTodo}
+          />
           <TodoList
             todos = {this.state.todos}
             updateVal = {this.updateVal}
@@ -72,7 +82,17 @@ app.components = app.components || {};
   var NewTodo = app.components.NewTodo = React.createClass({
     render: function() {
       return (
-        <h1>New Todo</h1>
+        <div className="add-todo-group input-group input-group-lg">
+          <span className="input-group-addon">
+            <i className="glyphicon glyphicon-list-alt"></i>
+          </span>
+          <input placeholder="New Todo" className="form-control" type="text" />
+          <span className="input-group-btn">
+            <button className="btn btn-success" type="button" onClick={this.handleNewTodo}>
+              <i className="glyphicon glyphicon-plus"></i>
+            </button>
+          </span>
+        </div>
       );
     }
   });
