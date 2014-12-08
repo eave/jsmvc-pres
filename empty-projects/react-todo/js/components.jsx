@@ -13,7 +13,7 @@ app.components = app.components || {};
     getInitialState: function() {
       return {
         todos: []
-      }
+      };
     },
 
     // this is a native react function that is called and executes before the component mounts and goes out onto the page
@@ -31,10 +31,14 @@ app.components = app.components || {};
 
     render: function() {
       // jsx can only have one root element
+      // in the todos = {this.state.todos} line below, we are passing the todos 'state' down from the parent component 'TodoApp', which we're inside of, down to the child component 'TodoList' in the form of props
+      // this.state.todos refers to the todos array specified on line fifteen
       return (
         <div className="outer-container">
           <NewTodo />
-          <TodoList />
+          <TodoList
+            todos = {this.state.todos}
+          />
           <ClearCompleted />
         </div>
       );
@@ -51,8 +55,44 @@ app.components = app.components || {};
 
   var TodoList = app.components.TodoList = React.createClass({
     render: function() {
+      // the code with .map below is the equivalent of ng-repeat for react
+      // in react, it's actually just vanilla javascript
+      // here is where we're receiving the todo props that we passed down to 'TodoList' from 'TodoApp'
       return (
-        <h1>Todo List</h1>
+        <div className="todos">
+          {this.props.todos.map(function(el, index) {
+            // here, we're passing each todo down from 'TodoList' to a new component, 'TodoItem'
+            return (
+              <TodoItem
+                todo={el}
+                index={index}
+              />
+            )
+          })}
+        </div>
+      );
+    }
+  });
+
+  var TodoItem = app.components.TodoItem = React.createClass({
+    render: function() {
+      var inputClassName = "form-control";
+      if (this.props.todo.completed) {
+        inputClassName += " finished";
+      }
+
+      return (
+        <div className="input-group input-group-lg">
+          <span className="input-group-addon">
+            <input checked={this.props.todo.completed} type="checkbox" />
+          </span>
+          <input type="text" value={this.props.todo.val} className={inputClassName} />
+          <span className="input-group-btn">
+            <button className="btn btn-danger" type="button">
+              <i className="glyphicon glyphicon-remove"></i>
+            </button>
+          </span>
+        </div>
       );
     }
   });
