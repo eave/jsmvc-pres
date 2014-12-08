@@ -26,7 +26,13 @@ app.components = app.components || {};
     componentDidMount: function() {
       var data = app.retrieveData();
       this.setState({todos: data});
-      console.log(this.state);
+    },
+
+    clearCompleted: function() {
+      var newTodos = this.state.todos.filter(function(el, index) {
+        return !el.completed;
+      });
+      this.setState({todos: newTodos});
     },
 
     createNewTodo: function(newValue) {
@@ -73,7 +79,9 @@ app.components = app.components || {};
             toggleCompleted = {this.toggleCompleted}
             deleteTodo = {this.deleteTodo}
           />
-          <ClearCompleted />
+          <ClearCompleted 
+            clearCompleted={this.clearCompleted}
+          />
         </div>
       );
     }
@@ -173,9 +181,15 @@ app.components = app.components || {};
   });
 
   var ClearCompleted = app.components.ClearCompleted = React.createClass({
+    handleClick: function(event) {
+      this.props.clearCompleted();
+    },
+
     render: function() {
       return (
-        <h1>Clear Completed</h1>
+        <div className="btn-clear-group">
+          <button onClick={this.handleClick} className="btn btn-primary btn-clear">Clear Completed</button>
+        </div>
       );
     }
   });
